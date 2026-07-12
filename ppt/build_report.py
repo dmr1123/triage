@@ -160,6 +160,80 @@ para(tf, "聚焦：訊號如何取得　×　如何結合主訴做判斷", 19, R
 tf2 = textbox(s, Inches(0.95), Inches(5.2), Inches(11), Inches(1))
 para(tf2, "5 篇論文 · 每篇 2 頁", 15, ACCENT, bold=True, first=True)
 
+# ================================================================= 總結 ①：便宜設備能取得哪些 EHR
+def _mat_pill(slide, right_x, y, text, color):
+    w = Inches(est_text_w_in(text, 10.5) + 0.42)
+    sp = rect(slide, right_x - w, y, w, Inches(0.36), fill=color, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.5)
+    tf = sp.text_frame; tf.word_wrap = False
+    tf.margin_left = 0; tf.margin_right = 0; tf.margin_top = 0; tf.margin_bottom = 0
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    para(tf, text, 10.5, WHITE, bold=True, align=PP_ALIGN.CENTER, first=True)
+
+s = _blank(prs)
+rect(s, 0, 0, SW, SH, fill=BG)
+title_bar(s, "總結 ①", "便宜設備現在能取得哪些 EHR 數據？", num=None)
+tfi = textbox(s, Inches(0.78), Inches(1.35), Inches(11.75), Inches(0.4))
+para(tfi, "這些正對應 EHR 裡的「生命徵象 / 臨床觀察」欄位。成熟度：綠=可靠　黃=篩檢級/研究中　紅=仍受限。",
+     10.5, MUTED, first=True)
+EAF = RGBColor(0xEA, 0xF2, 0xF6)
+ehr = [
+    ("心率 HR", "手機相機 PPG · 夾式血氧計 · 智慧手錶", "成熟", GREEN),
+    ("血氧 SpO₂", "夾式血氧計(準) · 手機相機＋閃光(篩檢級)", "成熟 / 篩檢", GREEN),
+    ("呼吸速率 RR", "App 點按(RRate) · 相機拍胸部起伏 · 麥克風", "尚可用", AMBER),
+    ("體溫", "紅外線體溫計外掛 · 相機 OCR 讀體溫計顯示", "成熟", GREEN),
+    ("血壓 BP", "多半仍需壓脈帶；純手機量測尚不可靠", "受限", RED),
+    ("咳嗽 / 呼吸音", "手機麥克風錄音（自動分類仍在研究）", "研究中", AMBER),
+    ("臨床觀察（水腫·蒼白·意識）", "由醫護觀察後輸入 EHR 欄位", "靠人判讀", ACCENT),
+]
+y0 = Inches(1.9); rh = Inches(0.66)
+for i, (name, method, mat, color) in enumerate(ehr):
+    y = y0 + i * rh
+    rect(s, Inches(0.78), y, Inches(11.75), Inches(0.56), fill=(PANEL if i % 2 else EAF), shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.1)
+    rect(s, Inches(0.78), y, Inches(0.09), Inches(0.56), fill=color)
+    tfn = textbox(s, Inches(1.0), y + Inches(0.06), Inches(3.1), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+    para(tfn, name, 12.5, INK, bold=True, first=True, line_spacing=1.0)
+    tfm = textbox(s, Inches(4.15), y + Inches(0.06), Inches(6.4), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+    para(tfm, method, 11, BODY, first=True, line_spacing=1.0)
+    _mat_pill(s, Inches(12.42), y + Inches(0.1), mat, color)
+callout(s, Inches(0.78), Inches(6.5), Inches(11.75), Inches(0.46), "",
+        "小結：真正便宜（<NT$5000）能穩定取得的以心率、血氧、體溫、呼吸為主；血壓與聲音類仍是弱點。", accent=PRIMARY, fill=PANEL)
+
+# ================================================================= 總結 ②：主訴 × EHR 整合方法
+s = _blank(prs)
+rect(s, 0, 0, SW, SH, fill=BG)
+title_bar(s, "總結 ②", "現在「主訴 × EHR」的整合方法", num=None)
+methods = [
+    ("A. 統計 / 機器學習模型", MODEL,
+     "把症狀編成 0/1，和 EHR 數字放進同一條公式加權計算。",
+     "例：Smart Triage、miniPIERS（logistic 回歸）",
+     "優：簡單、可解釋　　缺：症狀需先設計成勾選項"),
+    ("B. 深度學習讀「自由文字」", MODEL,
+     "主訴文字→詞向量(embedding)→神經網路，與 EHR 數字融合。",
+     "例：Joseph 2020（加主訴 AUC 0.82→0.85）",
+     "優：最靈活、免人工整理　　缺：黑盒、需大量資料"),
+    ("C. 人工融合（醫師）", ACCENT,
+     "EHR 數據＋症狀上傳儀表板，由醫師看趨勢判讀。",
+     "例：e-CoVig",
+     "優：免訓練資料、可解釋　　缺：仍要人力"),
+    ("D. 規則 / 危險徵象清單（傳統）", MUTED,
+     "用固定規則，如 WHO 危險徵象、ESI 分級。",
+     "常作為比較基準",
+     "優：透明、好推廣　　缺：較不準（ESI AUC≈0.67）"),
+]
+for i, (title, accent, how, ex, pc) in enumerate(methods):
+    col = i % 2; row = i // 2
+    x = Inches(0.78) + col * Inches(6.0)
+    y = Inches(1.65) + row * Inches(2.5)
+    rect(s, x, y, Inches(5.75), Inches(2.3), fill=PANEL, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.05)
+    rect(s, x, y, Inches(0.11), Inches(2.3), fill=accent)
+    tf = textbox(s, x + Inches(0.3), y + Inches(0.18), Inches(5.25), Inches(2.0))
+    para(tf, title, 14, PRIMARY, bold=True, space_after=6, first=True)
+    para(tf, how, 11.5, BODY, space_after=6, line_spacing=1.16)
+    para(tf, ex, 11, ACCENT, bold=True, space_after=5, line_spacing=1.12)
+    para(tf, pc, 10.5, MUTED, line_spacing=1.12)
+callout(s, Inches(0.78), Inches(6.55), Inches(11.75), Inches(0.44), "",
+        "四種方法可混用：多數系統用 A/B 自動算風險，或用 C 讓醫師把關；A、B 正是「把主訴變成模型輸入」。", accent=PRIMARY, fill=PANEL)
+
 # ================================================================= OVERVIEW
 s = _blank(prs)
 rect(s, 0, 0, SW, SH, fill=BG)
