@@ -1,8 +1,6 @@
 # generated preview / test artifacts
 *.png
-_test.pptx
-_test.pdf
-min.pptx
+_*.pptx
 *.pdf
 lo_profile/
 __pycache__/

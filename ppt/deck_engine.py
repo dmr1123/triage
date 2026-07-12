@@ -205,6 +205,54 @@ def footer(slide, text="低成本設備 × 生命徵象 × 主訴 → 初步檢�
     para(tf, text, 8.5, MUTED, first=True)
 
 
+def badge(slide, l, t, label, value, kind="ok", w=Inches(2.55), h=Inches(0.72)):
+    """A labeled yes/no style badge. kind: 'ok'(green), 'no'(red), 'warn'(amber), 'info'(teal)."""
+    cmap = {"ok": GREEN, "no": RED, "warn": AMBER, "info": ACCENT}
+    c = cmap.get(kind, ACCENT)
+    sp = rect(slide, l, t, w, h, fill=WHITE, line=c, line_w=1.6,
+              shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.14)
+    bar = rect(slide, l, t, Inches(0.10), h, fill=c)
+    tf = textbox(slide, l + Inches(0.22), t + Inches(0.07), w - Inches(0.3), h - Inches(0.12),
+                 anchor=MSO_ANCHOR.MIDDLE)
+    para(tf, label, 9.5, MUTED, bold=True, space_after=1, first=True, line_spacing=0.98)
+    para(tf, value, 12, c, bold=True, space_after=0, line_spacing=1.0)
+    return sp
+
+
+def callout(slide, l, t, w, h, title, body, accent=ACCENT, fill=None):
+    fill = fill if fill is not None else RGBColor(0xED, 0xF6, 0xF8)
+    sp = rect(slide, l, t, w, h, fill=fill, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.06)
+    rect(slide, l, t, Inches(0.10), h, fill=accent)
+    tf = textbox(slide, l + Inches(0.26), t + Inches(0.14), w - Inches(0.42), h - Inches(0.24))
+    if title:
+        para(tf, title, 11.5, accent, bold=True, space_after=4, first=True)
+        para(tf, body, 11.5, BODY, line_spacing=1.16)
+    else:
+        para(tf, body, 11.5, BODY, line_spacing=1.16, first=True)
+    return sp
+
+
+def panel_titled(slide, l, t, w, h, title, accent=PRIMARY, fill=PANEL):
+    sp = rect(slide, l, t, w, h, fill=fill, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.05)
+    tf = textbox(slide, l + Inches(0.22), t + Inches(0.14), w - Inches(0.4), Inches(0.4))
+    para(tf, title, 12.5, accent, bold=True, first=True)
+    return sp, l + Inches(0.22), t + Inches(0.58), w - Inches(0.44)
+
+
+def section_divider(prs, kicker, title, subtitle, num_label):
+    s = _blank(prs)
+    rect(s, 0, 0, SW, SH, fill=PRIMD)
+    rect(s, 0, 0, Inches(0.22), SH, fill=ACCENT)
+    # big number
+    tf0 = textbox(s, Inches(0.85), Inches(1.5), Inches(4), Inches(2.2))
+    para(tf0, num_label, 92, RGBColor(0x22, 0x5A, 0x72), bold=True, first=True)
+    tf = textbox(s, Inches(0.9), Inches(3.5), Inches(11.4), Inches(2.4))
+    para(tf, kicker, 13, ACCENT, bold=True, space_after=6, first=True)
+    para(tf, title, 30, WHITE, bold=True, space_after=10, line_spacing=1.05)
+    para(tf, subtitle, 15, RGBColor(0xC9, 0xDD, 0xE6), line_spacing=1.2)
+    return s
+
+
 def flow_snake(slide, left, top, width, labels, model_labels, details=None,
                box_h=Inches(1.02), gap=Inches(0.30), max_cols=5):
     """Draw a snaking left->right / right->left flow of rounded boxes with arrows.
