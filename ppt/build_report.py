@@ -232,6 +232,37 @@ callout(s, Inches(0.78), Inches(6.34), Inches(11.75), Inches(0.66), "核心",
         "相機其實只做兩件事：① 當「接觸式血氧感測器」（指尖 PPG → 心率可靠、血氧篩檢級）；② 當「掃描器」（OCR 讀既有裝置螢幕）。體溫、血壓相機都做不好。",
         accent=MODEL, fill=MODELBG)
 
+# ================================================================= 總結 ①c：相機還能測更多（進階）
+s = _blank(prs)
+rect(s, 0, 0, SW, SH, fill=BG)
+title_bar(s, "總結 ①c · 相機進階", "手機相機還能「篩檢」出這些（超出這 5 篇的研究）", num=None)
+tfi = textbox(s, Inches(0.78), Inches(1.32), Inches(11.75), Inches(0.4))
+para(tfi, "以下多來自這 5 篇以外的相機健康量測文獻，屬篩檢/研究級。狀態：綠=較成熟　黃=篩檢/研究　紅=實驗", 10.5, MUTED, first=True)
+more = [
+    ("心房顫動 / 心律不整", "手指 PPG 脈搏不規則 → 偵測", "統合 敏感94%/特異96%", "篩檢級", GREEN),
+    ("心率變異 HRV", "PPG 逐拍間隔 → 自律神經/壓力", "接觸 或 臉部 rPPG", "可行", AMBER),
+    ("貧血 / 血紅素 Hb", "眼結膜 或 指甲床影像 → 估 Hb", "結膜~75%；HemaApp", "篩檢/研究", AMBER),
+    ("黃疸 / 膽紅素（新生兒）", "皮膚 或 鞏膜影像 → 估膽紅素", "BiliCam R.84–.91、BiliScreen", "篩檢", AMBER),
+    ("微血管回填 CRT", "指壓後短影片 → 自動測回填時間", "Cap App；敗血症檢傷", "新興", AMBER),
+    ("瞳孔光反射 PLR", "前鏡頭＋閃光拍瞳孔對光收縮", "PupilScreen；腦傷/中風", "研究", AMBER),
+    ("非接觸臉部 rPPG", "環境光拍臉 → 心率/呼吸/HRV（免碰）", "HR 誤差~0.1–0.4 bpm", "HR 可靠", GREEN),
+]
+y0 = Inches(1.86); rh = Inches(0.64)
+for i, (name, how, rep, st, color) in enumerate(more):
+    y = y0 + i * rh
+    rect(s, Inches(0.78), y, Inches(11.75), Inches(0.54), fill=(PANEL if i % 2 else EAF), shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.1)
+    rect(s, Inches(0.78), y, Inches(0.09), Inches(0.54), fill=color)
+    tfn = textbox(s, Inches(1.0), y + Inches(0.05), Inches(2.85), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+    para(tfn, name, 11.5, INK, bold=True, first=True, line_spacing=1.0)
+    tfm = textbox(s, Inches(3.9), y + Inches(0.05), Inches(4.35), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+    para(tfm, how, 10.5, BODY, first=True, line_spacing=1.0)
+    tfp = textbox(s, Inches(8.35), y + Inches(0.05), Inches(2.55), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+    para(tfp, rep, 10, ACCENT, bold=True, first=True, line_spacing=1.0)
+    _mat_pill(s, Inches(12.42), y + Inches(0.09), st, color)
+callout(s, Inches(0.78), Inches(6.42), Inches(11.75), Inches(0.62), "",
+        "共同原理：都在分析影像的「顏色·脈動·形狀」。多屬篩檢/研究級、不取代正式檢驗；顏色類（血氧·貧血·黃疸）受膚色影響是共同限制。",
+        accent=MODEL, fill=MODELBG)
+
 # ================================================================= 總結 ②：主訴 × EHR 整合方法
 s = _blank(prs)
 rect(s, 0, 0, SW, SH, fill=BG)
