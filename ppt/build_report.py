@@ -151,13 +151,64 @@ def render_report_paper(prs, p):
 
 
 
+def glossary_report(prs):
+    """名詞速記：把報告後面會用到的術語先解釋清楚。"""
+    s = _blank(prs)
+    rect(s, 0, 0, SW, SH, fill=BG)
+    title_bar(s, "名詞速記", "先解釋術語——後面不再出現沒說明的縮寫", num=None)
+    cols = [
+        ("核心概念", PRIMARY, [
+            ("檢傷 Triage", "人手不足時，快速決定「誰先看」。"),
+            ("生命徵象", "心率·呼吸·血壓·體溫·血氧等基本讀數。"),
+            ("主訴", "病人自己說哪裡不舒服（常一句話或勾選）。"),
+            ("EHR 電子病歷", "存放病人資料的系統。"),
+            ("篩檢級", "能初步過篩，但不取代正式檢驗。"),
+            ("醫療級", "準確度接近正式醫療器材。"),
+        ]),
+        ("訊號與感測", ACCENT, [
+            ("SpO₂ 血氧", "血液帶氧百分比，低於 90% 危險。"),
+            ("PPG", "用光看血液脈動（忽亮忽暗＝心跳）。"),
+            ("rPPG", "不碰身體、拍臉也能量的 PPG。"),
+            ("OCR", "讓相機「讀」出螢幕上的數字。"),
+            ("HRV 心率變異", "心跳間隔的變化，反映自律神經。"),
+            ("MUAC 上臂圍", "量上臂一圈，看營養/病況。"),
+        ]),
+        ("AI 與模型", MODEL, [
+            ("模型", "從資料學出規則：吃數字 → 吐預測。"),
+            ("Logistic 回歸", "幾個輸入加權 → 算出 0~100% 機率。"),
+            ("CNN", "擅長從影像/訊號抓特徵的神經網路。"),
+            ("詞向量 embedding", "把文字變數字，讓模型讀懂主訴。"),
+            ("AUC", "模型排序準不準：0.5 瞎猜～1 完美。"),
+            ("ESI", "美國急診 5 級檢傷量表（傳統基準）。"),
+        ]),
+    ]
+    xs = [Inches(0.78), Inches(4.68), Inches(8.58)]
+    cw = Inches(3.7)
+    for ci, (htitle, hcolor, terms) in enumerate(cols):
+        x = xs[ci]
+        hb = rect(s, x, Inches(1.6), cw, Inches(0.44), fill=hcolor, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.12)
+        htf = hb.text_frame; htf.vertical_anchor = MSO_ANCHOR.MIDDLE; htf.margin_left = Inches(0.12)
+        para(htf, htitle, 12.5, WHITE, bold=True, first=True)
+        for ti, (term, defn) in enumerate(terms):
+            y = Inches(2.18) + ti * Inches(0.76)
+            rect(s, x, y, cw, Inches(0.68), fill=PANEL, shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.08)
+            rect(s, x, y, Inches(0.07), Inches(0.68), fill=hcolor)
+            tf = textbox(s, x + Inches(0.2), y + Inches(0.08), cw - Inches(0.3), Inches(0.56))
+            para(tf, term, 11, PRIMARY, bold=True, space_after=1, first=True, line_spacing=1.0)
+            para(tf, defn, 9.3, BODY, line_spacing=1.06)
+    callout(s, Inches(0.78), Inches(6.82), Inches(11.75), Inches(0.42), "",
+            "其他縮寫：CRT=微血管回填時間　·　PLR=瞳孔光反射　·　miniPIERS=一個孕婦風險模型　·　ratio-of-ratios=血氧計的比值算法。",
+            accent=PRIMARY, fill=PANEL)
+
+
 # ================================================================= FRONT + SUMMARY (shared)
 import summary_slides as ss
 ss.title_slide(prs, "低成本設備輔助檢傷（報告版）",
                ["聚焦：訊號如何取得 × 如何結合主訴做判斷",
                 "並統整「相機 / App / 便宜設備」能測到哪些數值"],
                "5 篇論文 · 每篇 2 頁")
-ss.overview_map(prs)       # 第一頁：總覽
+glossary_report(prs)       # 名詞速記：先把術語解釋清楚（放最前面）
+ss.overview_map(prs)       # 總覽
 ss.tiers(prs)              # 能力分層 Lv1 相機 / Lv2 App / Lv3 便宜設備
 ss.capability_matrix(prs)  # 能力對照表
 ss.ehr_data(prs)
