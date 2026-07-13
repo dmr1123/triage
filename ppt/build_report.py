@@ -201,6 +201,37 @@ callout(s, Inches(0.78), Inches(6.42), Inches(11.75), Inches(0.6), "",
         "註：論文 4（Joseph）不新增感測，直接沿用 EHR 既有生命徵象數字；上表列的是「用便宜設備主動取得」的對應。"
         "真正穩定 <NT$5000 的以心率、血氧、體溫、呼吸為主，血壓與聲音類仍是弱點。", accent=PRIMARY, fill=PANEL)
 
+# ================================================================= 總結 ①b：只用相機能做哪些
+s = _blank(prs)
+rect(s, 0, 0, SW, SH, fill=BG)
+title_bar(s, "總結 ①b · 聚焦相機", "只用手機相機（含閃光），能做到哪些？", num=None)
+tfi = textbox(s, Inches(0.78), Inches(1.32), Inches(11.75), Inches(0.4))
+para(tfi, "把上一頁篩成「純相機、不外接任何硬體」能做的。狀態：綠=可靠　黃=篩檢/研究　紅=做不到/實驗", 10.5, MUTED, first=True)
+cam = [
+    ("心率 HR", "手指蓋後鏡頭＋閃光 → 接觸式 PPG（血液脈動亮暗）", "論文 3·5", "可靠", GREEN),
+    ("血氧 SpO₂", "同段指尖影片，比紅/藍綠光脈動比值 → CNN 估算", "論文 5", "篩檢級", AMBER),
+    ("讀螢幕數字（OCR）", "拍血氧計/體溫計螢幕 → OCR 讀數字（間接）", "論文 3", "間接·成熟", GREEN),
+    ("呼吸速率 RR", "指尖 PPG 基線起伏，或前鏡頭拍胸部起伏", "一般方法", "可行·研究", AMBER),
+    ("體溫", "相機測不到熱 → 不能直測，只能 OCR 讀體溫計", "論文 3 (OCR)", "不能直測", RED),
+    ("血壓 BP", "PPG 波形估血壓仍實驗、不可靠、非臨床級", "非這 5 篇", "實驗", RED),
+    ("咳嗽 / 呼吸音", "屬手機「麥克風」，不是相機的工作", "—", "非相機", MUTED),
+]
+y0 = Inches(1.86); rh = Inches(0.64)
+for i, (name, how, papers, st, color) in enumerate(cam):
+    y = y0 + i * rh
+    rect(s, Inches(0.78), y, Inches(11.75), Inches(0.54), fill=(PANEL if i % 2 else EAF), shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.1)
+    rect(s, Inches(0.78), y, Inches(0.09), Inches(0.54), fill=color)
+    tfn = textbox(s, Inches(1.0), y + Inches(0.05), Inches(2.85), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+    para(tfn, name, 12, INK, bold=True, first=True, line_spacing=1.0)
+    tfm = textbox(s, Inches(3.9), y + Inches(0.05), Inches(5.0), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+    para(tfm, how, 10.5, BODY, first=True, line_spacing=1.0)
+    tfp = textbox(s, Inches(8.98), y + Inches(0.05), Inches(1.95), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+    para(tfp, papers, 10.5, ACCENT, bold=True, first=True, line_spacing=1.0)
+    _mat_pill(s, Inches(12.42), y + Inches(0.09), st, color)
+callout(s, Inches(0.78), Inches(6.34), Inches(11.75), Inches(0.66), "核心",
+        "相機其實只做兩件事：① 當「接觸式血氧感測器」（指尖 PPG → 心率可靠、血氧篩檢級）；② 當「掃描器」（OCR 讀既有裝置螢幕）。體溫、血壓相機都做不好。",
+        accent=MODEL, fill=MODELBG)
+
 # ================================================================= 總結 ②：主訴 × EHR 整合方法
 s = _blank(prs)
 rect(s, 0, 0, SW, SH, fill=BG)
