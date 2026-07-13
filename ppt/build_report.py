@@ -210,14 +210,14 @@ def _pill_right(slide, right_x, y, text, color):
     para(tf, text, 10, WHITE, bold=True, align=PP_ALIGN.CENTER, first=True)
 
 
-def ai_papers_slide(prs, section_label, rows, repos_note=None):
+def ai_papers_slide(prs, section_label, rows, repos_note=None, subtitle=None):
     """每個方法 → 代表『結合 AI』論文，附查證等級。"""
     s = _blank(prs)
     rect(s, 0, 0, SW, SH, fill=BG)
-    title_bar(s, "能力分層 · 代表 AI 論文", "每個方法至少關聯一篇「結合 AI」的論文　·　" + section_label, num=None)
-    tfi = textbox(s, Inches(0.78), Inches(1.28), Inches(11.75), Inches(0.5))
-    para(tfi, "查證：已見原文＝在 GitHub 看到 arXiv 原始碼/作者程式碼；搜尋佐證＝論文真實、AI 用途有原頁引文，"
-              "但全文 PDF 因本環境網路政策(egress)被擋、無法下載。", 9.5, MUTED, first=True, line_spacing=1.15)
+    title_bar(s, "能力分層 · 代表 AI 論文", section_label, num=None)
+    tfi = textbox(s, Inches(0.78), Inches(1.28), Inches(11.75), Inches(0.55))
+    para(tfi, subtitle or "查證：已見原文＝在 GitHub 看到 arXiv 原始碼/作者程式碼；搜尋佐證＝論文真實、AI 用途有原頁引文，"
+              "但全文 PDF 因本環境網路政策(egress)被擋、無法下載。", 9.5, MUTED, first=True, line_spacing=1.18)
     y0 = Inches(1.86); rh = Inches(0.585)
     for i, (method, ai, paper, vtext, vcolor) in enumerate(rows):
         y = y0 + i * rh
@@ -230,7 +230,7 @@ def ai_papers_slide(prs, section_label, rows, repos_note=None):
         para(tfp, paper, 10, PRIMARY, bold=True, first=True, line_spacing=1.05)
         _pill_right(s, Inches(12.42), y + Inches(0.08), vtext, vcolor)
     if repos_note:
-        callout(s, Inches(0.78), Inches(6.5), Inches(11.75), Inches(0.8), "已見原文的程式碼來源（GitHub 可存取）",
+        callout(s, Inches(0.78), Inches(6.05), Inches(11.75), Inches(1.05), "已見原文的程式碼來源（GitHub 可存取）",
                 repos_note, accent=GREEN, fill=RGBColor(0xEC, 0xF6, 0xF0))
     else:
         footer(s)
@@ -245,31 +245,23 @@ ss.title_slide(prs, "低成本設備輔助檢傷（報告版）",
 glossary_report(prs)       # 名詞速記：先把術語解釋清楚（放最前面）
 ss.overview_map(prs)       # 總覽
 ss.tiers(prs)              # 能力分層 Lv1 相機 / Lv2 App / Lv3 便宜設備
-# 每個方法的代表「結合 AI」論文（已查證）
-_AI_LV1 = [
-    ("心率（指尖 PPG）", "conv＋LSTM 回歸心率", "Samavati 2022, arXiv:2204.08989（MEDVSE）", "已見原文", GREEN),
-    ("血氧 SpO₂（相機）", "CNN 估血氧", "Hoffman 2022, npj Digit Med 5:146", "已見原文", GREEN),
-    ("非接觸 rPPG（臉→心率/呼吸）", "深度卷積＋注意力", "Chen & McDuff 2018, ECCV（DeepPhys）", "已見原文", GREEN),
-    ("心房顫動（PPG）", "深度 CNN 分類 AF", "Poh 2018, Heart 104:1921", "AI 已確認", GREEN),
-    ("貧血 / 血紅素（結膜影像）", "UNet＋深度回歸 Hb", "Chen 2024, BMC Med Inform Decis Mak 24", "搜尋佐證", AMBER),
-    ("黃疸 / 膽紅素（皮膚影像）", "ML 回歸估膽紅素", "BiliCam：Taylor 2017, Pediatrics 140:e20170312", "搜尋佐證", AMBER),
-    ("瞳孔光反射（前鏡頭）", "CNN 追瞳孔直徑", "PupilScreen：Mariakakis 2017, ACM IMWUT 1(3)", "搜尋佐證", AMBER),
-    ("微血管回填 CRT", "（現有相機 CRT 為曲線擬合、非 ML）", "無合格 camera＋AI 論文（僅未發表 App/專利）", "無", RED),
-]
-_AI_LV23 = [
-    ("Lv2 咳嗽音（麥克風）", "CNN / ResNet50 分類咳嗽", "Pahar 2021, Comput Biol Med 135:104572", "已見原文", GREEN),
-    ("Lv2 主訴文字（＋徵象）", "神經網路融合詞向量＋徵象", "Joseph 2020, JACEP Open 1(5):773", "已見原文", GREEN),
-    ("Lv2 步態 / 跌倒（加速度計）", "ML（SVM）偵測步態異常", "Kocuvan 2023, Sensors 23(19):8294", "搜尋佐證", AMBER),
-    ("Lv2 呼吸速率（呼吸音）", "ConvLSTM 抓吐氣段", "Fukuyama 2022, Adv Biomed Eng（DOI 未確認）", "來源較弱", RED),
-    ("Lv3 穿戴 PPG → 惡化預測", "Transformer 預測 2h 後惡化", "Ming 2024, npj Digit Med（登革熱穿戴）", "已見原文", GREEN),
+# 只列「100% 已查證原文（在 GitHub 看到作者原始碼/程式碼）」的方法
+_AI_CONFIRMED = [
+    ("Lv1 心率（指尖 PPG）", "conv＋LSTM 回歸心率", "Samavati 2022, arXiv:2204.08989（MEDVSE）", "已見原文", GREEN),
+    ("Lv1 血氧 SpO₂（相機）", "CNN 估血氧", "Hoffman 2022, npj Digit Med 5:146", "已見原文", GREEN),
+    ("Lv1 非接觸 rPPG（臉→心率/呼吸）", "深度卷積＋注意力", "Chen & McDuff 2018, ECCV（DeepPhys）", "已見原文", GREEN),
+    ("Lv2 主訴文字（＋生命徵象）", "神經網路融合詞向量＋徵象", "Joseph 2020, JACEP Open 1(5):773", "已見原文", GREEN),
     ("Lv3 單導程 ECG → 心律不整", "34 層 CNN 分 12 種心律", "Hannun 2019, Nature Medicine 25:65", "已見原文", GREEN),
-    ("Lv3 Cuffless 血壓（PPG）", "DNN＋LSTM 由 PPG 估血壓", "Hsu 2020, Sensors 20(19):5668", "已見原文", GREEN),
-    ("Lv3 連續血糖 CGM → 低血糖", "LSTM 預測 30 分鐘低血糖", "Shao 2024, JMIR Med Inform 12:e56909", "搜尋佐證", AMBER),
+    ("Lv3 Cuffless 血壓（PPG）", "DNN 由 PPG 估血壓", "Hsu 2020, Sensors 20(19):5668", "已見原文", GREEN),
+    ("Lv3 穿戴 PPG → 惡化預測", "Transformer 預測 2h 後惡化", "Ming 2024, npj Digit Med（登革熱）", "已見原文", GREEN),
 ]
-_REPO_LV1 = ("MEDVSE：github.com/MahdiFarvardin/MEDVSE　·　Hoffman：github.com/ubicomplab/oximetry-phone-cam-data　·　DeepPhys：github.com/ubicomplab/rPPG-Toolbox")
-_REPO_LV23 = ("Joseph：github.com/jwjoseph/NN_triage_predict　·　Hannun：github.com/awni/ecg（官方）　·　Hsu：github.com/Yan-Cheng-Hsu/Blood-Pressure-Estimation-Model（官方）　·　Ming：github.com/jsmdaniels/VITAL（官方）　·　Pahar：github.com/raina-akshay/covidfromcough（第三方）")
-ai_papers_slide(prs, "Lv1 相機（含閃光）", _AI_LV1, repos_note=_REPO_LV1)
-ai_papers_slide(prs, "Lv2 App ＋ Lv3 便宜外接設備", _AI_LV23, repos_note=_REPO_LV23)
+_REPO_CONFIRMED = ("MEDVSE：github.com/MahdiFarvardin/MEDVSE　·　Hoffman：github.com/ubicomplab/oximetry-phone-cam-data　·　"
+                   "DeepPhys：github.com/ubicomplab/rPPG-Toolbox　·　Joseph：github.com/jwjoseph/NN_triage_predict　·　"
+                   "Hannun：github.com/awni/ecg（官方）　·　Hsu：github.com/Yan-Cheng-Hsu/Blood-Pressure-Estimation-Model（官方）　·　"
+                   "Ming：github.com/jsmdaniels/VITAL（官方）")
+_AI_SUBTITLE = ("只保留能在 GitHub 看到「作者原始碼／程式碼」、100% 確認用 AI 的方法（皆標「已見原文」）。"
+                "其餘（心房顫動、貧血、黃疸、瞳孔、咳嗽、微血管回填、血糖、步態、呼吸音）因無法 100% 確認原文，暫不列入，待全文可存取再補。")
+ai_papers_slide(prs, "僅列 100% 已查證原文者", _AI_CONFIRMED, repos_note=_REPO_CONFIRMED, subtitle=_AI_SUBTITLE)
 ss.capability_matrix(prs)  # 能力對照表
 ss.ehr_data(prs)
 ss.camera_basic(prs)
