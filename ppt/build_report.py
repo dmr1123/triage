@@ -210,26 +210,30 @@ def _pill_right(slide, right_x, y, text, color):
     para(tf, text, 10, WHITE, bold=True, align=PP_ALIGN.CENTER, first=True)
 
 
-def ai_papers_slide(prs, section_label, rows):
+def ai_papers_slide(prs, section_label, rows, repos_note=None):
     """每個方法 → 代表『結合 AI』論文，附查證等級。"""
     s = _blank(prs)
     rect(s, 0, 0, SW, SH, fill=BG)
     title_bar(s, "能力分層 · 代表 AI 論文", "每個方法至少關聯一篇「結合 AI」的論文　·　" + section_label, num=None)
-    tfi = textbox(s, Inches(0.78), Inches(1.3), Inches(11.75), Inches(0.5))
+    tfi = textbox(s, Inches(0.78), Inches(1.28), Inches(11.75), Inches(0.5))
     para(tfi, "查證：已見原文＝在 GitHub 看到 arXiv 原始碼/作者程式碼；搜尋佐證＝論文真實、AI 用途有原頁引文，"
               "但全文 PDF 因本環境網路政策(egress)被擋、無法下載。", 9.5, MUTED, first=True, line_spacing=1.15)
-    y0 = Inches(1.94); rh = Inches(0.62)
+    y0 = Inches(1.86); rh = Inches(0.585)
     for i, (method, ai, paper, vtext, vcolor) in enumerate(rows):
         y = y0 + i * rh
-        rect(s, Inches(0.78), y, Inches(11.75), Inches(0.54), fill=(PANEL if i % 2 else RGBColor(0xEA, 0xF2, 0xF6)), shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.09)
-        rect(s, Inches(0.78), y, Inches(0.09), Inches(0.54), fill=vcolor)
-        tfn = textbox(s, Inches(1.0), y + Inches(0.05), Inches(3.0), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+        rect(s, Inches(0.78), y, Inches(11.75), Inches(0.5), fill=(PANEL if i % 2 else RGBColor(0xEA, 0xF2, 0xF6)), shape=MSO_SHAPE.ROUNDED_RECTANGLE, radius=0.09)
+        rect(s, Inches(0.78), y, Inches(0.09), Inches(0.5), fill=vcolor)
+        tfn = textbox(s, Inches(1.0), y + Inches(0.04), Inches(3.0), Inches(0.44), anchor=MSO_ANCHOR.MIDDLE)
         para(tfn, method, 11, INK, bold=True, space_after=0, first=True, line_spacing=1.0)
         para(tfn, ai, 8.5, MUTED, line_spacing=1.0)
-        tfp = textbox(s, Inches(4.1), y + Inches(0.05), Inches(5.9), Inches(0.46), anchor=MSO_ANCHOR.MIDDLE)
+        tfp = textbox(s, Inches(4.1), y + Inches(0.04), Inches(5.9), Inches(0.44), anchor=MSO_ANCHOR.MIDDLE)
         para(tfp, paper, 10, PRIMARY, bold=True, first=True, line_spacing=1.05)
-        _pill_right(s, Inches(12.42), y + Inches(0.09), vtext, vcolor)
-    footer(s)
+        _pill_right(s, Inches(12.42), y + Inches(0.08), vtext, vcolor)
+    if repos_note:
+        callout(s, Inches(0.78), Inches(6.5), Inches(11.75), Inches(0.8), "已見原文的程式碼來源（GitHub 可存取）",
+                repos_note, accent=GREEN, fill=RGBColor(0xEC, 0xF6, 0xF0))
+    else:
+        footer(s)
 
 
 # ================================================================= FRONT + SUMMARY (shared)
@@ -253,17 +257,19 @@ _AI_LV1 = [
     ("微血管回填 CRT", "（現有相機 CRT 為曲線擬合、非 ML）", "無合格 camera＋AI 論文（僅未發表 App/專利）", "無", RED),
 ]
 _AI_LV23 = [
-    ("Lv2 咳嗽音（麥克風）", "CNN / ResNet50 分類咳嗽", "Pahar 2021, Comput Biol Med 135:104572", "搜尋佐證", AMBER),
+    ("Lv2 咳嗽音（麥克風）", "CNN / ResNet50 分類咳嗽", "Pahar 2021, Comput Biol Med 135:104572", "已見原文", GREEN),
     ("Lv2 主訴文字（＋徵象）", "神經網路融合詞向量＋徵象", "Joseph 2020, JACEP Open 1(5):773", "已見原文", GREEN),
     ("Lv2 步態 / 跌倒（加速度計）", "ML（SVM）偵測步態異常", "Kocuvan 2023, Sensors 23(19):8294", "搜尋佐證", AMBER),
     ("Lv2 呼吸速率（呼吸音）", "ConvLSTM 抓吐氣段", "Fukuyama 2022, Adv Biomed Eng（DOI 未確認）", "來源較弱", RED),
-    ("Lv3 穿戴 PPG → 惡化預測", "Transformer 預測 2h 後惡化", "Ming 2024, npj Digit Med（登革熱穿戴）", "搜尋佐證", AMBER),
-    ("Lv3 單導程 ECG → 心律不整", "34 層 CNN 分 12 種心律", "Hannun 2019, Nature Medicine 25:65", "搜尋佐證", AMBER),
-    ("Lv3 Cuffless 血壓（PPG）", "DNN＋LSTM 由 PPG 估血壓", "Hsu 2020, Sensors 20(19):5668", "搜尋佐證", AMBER),
+    ("Lv3 穿戴 PPG → 惡化預測", "Transformer 預測 2h 後惡化", "Ming 2024, npj Digit Med（登革熱穿戴）", "已見原文", GREEN),
+    ("Lv3 單導程 ECG → 心律不整", "34 層 CNN 分 12 種心律", "Hannun 2019, Nature Medicine 25:65", "已見原文", GREEN),
+    ("Lv3 Cuffless 血壓（PPG）", "DNN＋LSTM 由 PPG 估血壓", "Hsu 2020, Sensors 20(19):5668", "已見原文", GREEN),
     ("Lv3 連續血糖 CGM → 低血糖", "LSTM 預測 30 分鐘低血糖", "Shao 2024, JMIR Med Inform 12:e56909", "搜尋佐證", AMBER),
 ]
-ai_papers_slide(prs, "Lv1 相機（含閃光）", _AI_LV1)
-ai_papers_slide(prs, "Lv2 App ＋ Lv3 便宜外接設備", _AI_LV23)
+_REPO_LV1 = ("MEDVSE：github.com/MahdiFarvardin/MEDVSE　·　Hoffman：github.com/ubicomplab/oximetry-phone-cam-data　·　DeepPhys：github.com/ubicomplab/rPPG-Toolbox")
+_REPO_LV23 = ("Joseph：github.com/jwjoseph/NN_triage_predict　·　Hannun：github.com/awni/ecg（官方）　·　Hsu：github.com/Yan-Cheng-Hsu/Blood-Pressure-Estimation-Model（官方）　·　Ming：github.com/jsmdaniels/VITAL（官方）　·　Pahar：github.com/raina-akshay/covidfromcough（第三方）")
+ai_papers_slide(prs, "Lv1 相機（含閃光）", _AI_LV1, repos_note=_REPO_LV1)
+ai_papers_slide(prs, "Lv2 App ＋ Lv3 便宜外接設備", _AI_LV23, repos_note=_REPO_LV23)
 ss.capability_matrix(prs)  # 能力對照表
 ss.ehr_data(prs)
 ss.camera_basic(prs)
